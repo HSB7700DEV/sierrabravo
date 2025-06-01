@@ -57,7 +57,7 @@ export default {
 
       // 3. Parse the HTML for both items using the helper function above
       const goldData = parseRow(html, 'هر گرم طلای ۱۸ عیار', 0, 1);
-      const tetherData = parseRow(html, 'تتر', 1, 2);
+      const tetherData = parseRow(html, 'تتر', 0, 1);
 
       // 4. Check if parsing was successful
       if (!goldData || !tetherData) {
@@ -70,8 +70,8 @@ export default {
                          `- Price: \`${goldData.value}\` Rial\n` +
                          `- Change: \`${goldData.change}\`\n\n` +
                          `💲 *Tether (USDT)*\n` +
-                         `- Price: \`${tetherData.change}\` Rial\n` +
-                         `- Change: \`${tetherData.value}\``;
+                         `- Price: \`${tetherData.value}\` Rial\n` +
+                         `- Change: \`${tetherData.change}\``;
 
       // 6. Edit the original message with the result
       await telegram.editMessage(chatId, messageId, resultText, env);
