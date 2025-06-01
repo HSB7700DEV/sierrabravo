@@ -3,11 +3,13 @@
 import telegram from './telegram';
 import startCommand from './commands/start';
 import pingCommand from './commands/ping';
+import currencyprizeCommand from './commands/currencyprize';
 
 // A Map to store our command handlers for easy lookup
 const commands = new Map();
 commands.set(startCommand.name, startCommand.handler);
 commands.set(pingCommand.name, pingCommand.handler);
+commands.set(currencyprizeCommand.name, currencyprizeCommand.handler);
 
 export default {
   async fetch(request, env) {
