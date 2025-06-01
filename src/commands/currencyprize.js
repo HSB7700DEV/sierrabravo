@@ -1,64 +1,85 @@
-// A simple, dependency-free HTML parser function for this specific task
-function parseGoldPrice(html) {
-  const targetRowIdentifier = 'هر گرم طلای ۱۸ عیار';
-  
-  // Find the start of the row containing our target text
-  const rowStartIndex = html.indexOf(targetRowIdentifier);
+// src/commands/currencyprize.js
+
+/**
+ * A helper function to parse data from a specific row in the IranJib HTML.
+ * This function is now private to this command file.
+ * @param {string} html The full HTML content of the page.
+ * @param {string} rowIdentifier The unique text that identifies the target row.
+ * @param {number} valueIndex The column index for the main value (0-based).
+ * @param {number} changeIndex The column index for the change value (0-based).
+ * @returns {{value: string, change: string} | null} The parsed data or null if not found.
+ */
+function parseRow(html, rowIdentifier, valueIndex, changeIndex) {
+  const rowStartIndex = html.indexOf(rowIdentifier);
   if (rowStartIndex === -1) {
-    throw new Error('Could not find the target row for 18 Karat Gold.');
+    return null;
   }
 
-  // Find the <tr> tag that contains this row
   const tableRowHtml = html.substring(rowStartIndex);
-  
-  // Use regular expressions to find the values in the <td> elements of that row
-  // This looks for content within <td> tags. It's not perfect but works for this structure.
   const cells = tableRowHtml.match(/<td[^>]*>([\s\S]*?)<\/td>/g);
 
-  if (!cells || cells.length < 4) {
-    throw new Error('Could not parse the data cells for the target row.');
+  if (!cells || cells.length < Math.max(valueIndex, changeIndex)) {
+    return null;
   }
 
-  // Helper to strip HTML tags and trim whitespace from a string
   const clean = (str) => str.replace(/<[^>]+>/g, '').trim();
+  const value = clean(cells[valueIndex]);
+  const change = clean(cells[changeIndex]);
 
-  // Based on the website's table structure:
-  // Cell 0: Live Price (قیمت زنده)
-  // Cell 1: Change (تغییر)
-  const livePrice = clean(cells[0]);
-  const change = clean(cells[1]);
-
-  return { livePrice, change };
+  return { value, change };
 }
 
-
+// The main command definition
 export default {
   name: '/currencyprize',
-  // ...
+  description: 'Fetches real-time prices for gold and Tether.',
+  /**
+   * @param {object} message The Telegram message object.
+   * @param {object} env The environment variables.
+   * @param {object} telegram The telegram helper object.
+   */
   handler: async (message, env, telegram) => {
     const chatId = message.chat.id;
-    const threadId = message.message_thread_id; // Get the thread ID
-    const url = 'https://www.iranjib.ir/showgroup/23/realtime_price/';
+    const threadId = message.message_thread_id;
     
-    // Pass threadId to the initial message
-    const initialMessage = await telegram.sendMessage(chatId, 'Fetching latest gold price... ⏳', env, threadId);
+    // 1. Send an initial "loading" message
+    const initialMessage = await telegram.sendMessage(chatId, 'Fetching latest market data... ⏳', env, threadId);
     const messageId = initialMessage.result.message_id;
 
     try {
-      // ... (rest of the try block is the same)
+      // 2. Fetch the website's HTML content
+      const url = 'https://www.iranjib.ir/showgroup/23/realtime_price/';
       const response = await fetch(url);
       if (!response.ok) {
         throw new Error(`Failed to fetch data. Status: ${response.status}`);
       }
       const html = await response.text();
-      const data = parseGoldPrice(html);
-      const resultText = `🥇 *18 Karat Gold Price*\n\n` +
-                         `- *Live Price:* \`${data.livePrice}\` Rial\n` +
-                         `- *Change:* \`${data.change}\``;
+
+      // 3. Parse the HTML for both items using the helper function above
+      const goldData = parseRow(html, 'هر گرم طلای ۱۸ عیار', 0, 1);
+      const tetherData = parseRow(html, 'تتر', 1, 2);
+
+      // 4. Check if parsing was successful
+      if (!goldData || !tetherData) {
+          throw new Error('Could not parse all required data. The website layout may have changed.');
+      }
+
+      // 5. Format the combined result into one message
+      const resultText = `📈 **Market Summary**\n\n` +
+                         `🥇 *18 Karat Gold*\n` +
+                         `- Price: \`${goldData.value}\` Rial\n` +
+                         `- Change: \`${goldData.change}\`\n\n` +
+                         `💲 *Tether (USDT)*\n` +
+                         `- Price: \`${tetherData.value}\` Rial\n` +
+                         `- Change: \`${tetherData.change}\``;
+
+      // 6. Edit the original message with the result
       await telegram.editMessage(chatId, messageId, resultText, env);
 
     } catch (error) {
-      // ... (catch block is the same)
+      console.error(error);
+      // If anything goes wrong, inform the user
+      await telegram.editMessage(chatId, messageId, `❌ **Error:**\nCould not retrieve market data. The website may be unavailable or its layout has changed.`, env);
     }
   },
 };
