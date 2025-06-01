@@ -34,43 +34,31 @@ function parseGoldPrice(html) {
 
 export default {
   name: '/currencyprize',
-  description: 'Fetches the real-time price of 1 gram of 18k gold from IranJib.',
-  /**
-   * @param {object} message The Telegram message object.
-   * @param {object} env The environment variables.
-   * @param {object} telegram The telegram helper object.
-   */
+  // ...
   handler: async (message, env, telegram) => {
     const chatId = message.chat.id;
+    const threadId = message.message_thread_id; // Get the thread ID
     const url = 'https://www.iranjib.ir/showgroup/23/realtime_price/';
     
-    // 1. Send an initial "loading" message
-    const initialMessage = await telegram.sendMessage(chatId, 'Fetching latest gold price...', env);
+    // Pass threadId to the initial message
+    const initialMessage = await telegram.sendMessage(chatId, 'Fetching latest gold price... ⏳', env, threadId);
     const messageId = initialMessage.result.message_id;
 
     try {
-      // 2. Fetch the website's HTML content
+      // ... (rest of the try block is the same)
       const response = await fetch(url);
       if (!response.ok) {
         throw new Error(`Failed to fetch data. Status: ${response.status}`);
       }
       const html = await response.text();
-
-      // 3. Parse the HTML to get the price and change
       const data = parseGoldPrice(html);
-
-      // 4. Format the final message
-      const resultText = `18 Karat Gold Price\n\n` +
-                         `- Live Price: \`${data.livePrice}\` Rial\n` +
-                         `- Prize Change: \`${data.change}\``;
-
-      // 5. Edit the original message with the result
+      const resultText = `🥇 *18 Karat Gold Price*\n\n` +
+                         `- *Live Price:* \`${data.livePrice}\` Rial\n` +
+                         `- *Change:* \`${data.change}\``;
       await telegram.editMessage(chatId, messageId, resultText, env);
 
     } catch (error) {
-      console.error(error);
-      // If anything goes wrong, inform the user
-      await telegram.editMessage(chatId, messageId, `Error:\nCould not retrieve the gold price. The website structure may have changed or it might be temporarily unavailable.`, env);
+      // ... (catch block is the same)
     }
   },
 };

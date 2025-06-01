@@ -13,6 +13,9 @@ commands.set(currencyprizeCommand.name, currencyprizeCommand.handler);
 
 export default {
   async fetch(request, env) {
+    // For debugging: log the incoming request
+    // console.log(JSON.stringify(await request.clone().json()));
+    
     if (request.method === "POST") {
       const payload = await request.json();
       return handleUpdate(payload, env);
@@ -29,20 +32,23 @@ export default {
 async function handleUpdate(update, env) {
   if (update.message) {
     const message = update.message;
-    const text = message.text;
+    const text = message.text || ''; // Ensure text is not undefined
 
-    // Check if the message text is a registered command
-    if (text && commands.has(text)) {
-      const handler = commands.get(text);
-      try {
-        await handler(message, env, telegram);
-      } catch (e) {
-        console.error(e);
-        await telegram.sendMessage(message.chat.id, 'An error occurred while processing your command.', env);
+    // Check if the message text is a command
+    if (text.startsWith('/')) {
+      // Handles both /ping and /ping@YourBotName
+      const commandName = text.split(' ')[0].split('@')[0];
+
+      if (commands.has(commandName)) {
+        const handler = commands.get(commandName);
+        try {
+          await handler(message, env, telegram);
+        } catch (e) {
+          console.error(e);
+          // Reply in the correct thread if an error occurs
+          await telegram.sendMessage(message.chat.id, 'An error occurred while processing your command.', env, message.message_thread_id);
+        }
       }
-    } else {
-      // Optional: Respond to unknown commands
-      // await telegram.sendMessage(message.chat.id, "Sorry, I don't recognize that command.", env);
     }
   }
   return new Response("OK");

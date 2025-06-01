@@ -10,7 +10,9 @@ export default {
    */
   handler: async (message, env, telegram) => {
     const chatId = message.chat.id;
+    const threadId = message.message_thread_id; // Get the thread ID
+
     const welcomeMessage = `This is SierraBravo.\n\n/ping - Check if the bot is alive\n/currencyprize - Get the Real-time price of currencies`;
-    await telegram.sendMessage(chatId, welcomeMessage, env);
+    await telegram.sendMessage(chatId, welcomeMessage, env, threadId); // Pass it here
   },
 };

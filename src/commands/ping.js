@@ -11,9 +11,11 @@ export default {
   handler: async (message, env, telegram) => {
     const chatId = message.chat.id;
     const startTime = Date.now();
+    const threadId = message.message_thread_id; // Get the thread ID
+
     
     // Send an initial message and get its details
-    const response = await telegram.sendMessage(chatId, "Pinging...", env);
+    const response = await telegram.sendMessage(chatId, "Pinging...", env, threadId);
     
     const endTime = Date.now();
     const latency = endTime - startTime;
