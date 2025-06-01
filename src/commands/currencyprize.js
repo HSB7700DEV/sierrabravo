@@ -70,8 +70,8 @@ export default {
                          `- Price: \`${goldData.value}\` Rial\n` +
                          `- Change: \`${goldData.change}\`\n\n` +
                          `💲 *Tether (USDT)*\n` +
-                         `- Price: \`${tetherData.value}\` Rial\n` +
-                         `- Change: \`${tetherData.change}\``;
+                         `- Price: \`${tetherData.change}\` Rial\n` +
+                         `- Change: \`${tetherData.value}\``;
 
       // 6. Edit the original message with the result
       await telegram.editMessage(chatId, messageId, resultText, env);
