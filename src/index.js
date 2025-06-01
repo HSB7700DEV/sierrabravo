@@ -6,7 +6,7 @@ export default {
         return handleMessage(payload.message, env);
       }
     }
-    return new Response("Hello! This is the Telegram bot worker.");
+    return new Response("Welcome! This is a Cloudflare-hosted Telegram Bot.");
   },
 };
 
