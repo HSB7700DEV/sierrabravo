@@ -1,7 +1,7 @@
 // src/commands/currencyprize.js
 
 /**
- * A helper function to parse data from a specific row in the IranJib HTML.
+ * A helper function to parse data from a specific row.
  * This function is now private to this command file.
  * @param {string} html The full HTML content of the page.
  * @param {string} rowIdentifier The unique text that identifies the target row.
