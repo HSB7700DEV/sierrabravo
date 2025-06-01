@@ -1,58 +1,47 @@
+// src/index.js
+
+import telegram from './telegram';
+import startCommand from './commands/start';
+import pingCommand from './commands/ping';
+
+// A Map to store our command handlers for easy lookup
+const commands = new Map();
+commands.set(startCommand.name, startCommand.handler);
+commands.set(pingCommand.name, pingCommand.handler);
+
 export default {
   async fetch(request, env) {
     if (request.method === "POST") {
       const payload = await request.json();
-      if (payload.message) {
-        return handleMessage(payload.message, env);
-      }
+      return handleUpdate(payload, env);
     }
-    return new Response("Welcome! This is a Cloudflare-hosted Telegram Bot.");
+    return new Response("This bot is running on Cloudflare Workers!");
   },
 };
 
-async function handleMessage(message, env) {
-  const chatId = message.chat.id;
-  const text = message.text;
+/**
+ * Handles incoming updates from Telegram.
+ * @param {object} update The Telegram update object.
+ * @param {object} env The environment variables.
+ */
+async function handleUpdate(update, env) {
+  if (update.message) {
+    const message = update.message;
+    const text = message.text;
 
-  if (text === "/start") {
-    await sendMessage(chatId, "Welcome to your Cloudflare-hosted Telegram Bot! 👋", env);
-  } else if (text === "/ping") {
-    const startTime = Date.now();
-    const response = await sendMessage(chatId, "Pinging...", env);
-    const endTime = Date.now();
-    const latency = endTime - startTime;
-    await editMessage(chatId, response.result.message_id, `Pong! Latency: ${latency} ms`, env);
+    // Check if the message text is a registered command
+    if (text && commands.has(text)) {
+      const handler = commands.get(text);
+      try {
+        await handler(message, env, telegram);
+      } catch (e) {
+        console.error(e);
+        await telegram.sendMessage(message.chat.id, 'An error occurred while processing your command.', env);
+      }
+    } else {
+      // Optional: Respond to unknown commands
+      // await telegram.sendMessage(message.chat.id, "Sorry, I don't recognize that command.", env);
+    }
   }
-
   return new Response("OK");
-}
-
-async function sendMessage(chatId, text, env) {
-  const url = `https://api.telegram.org/bot${env.BOT_TOKEN}/sendMessage`;
-  const response = await fetch(url, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({
-      chat_id: chatId,
-      text: text,
-    }),
-  });
-  return response.json();
-}
-
-async function editMessage(chatId, messageId, text, env) {
-  const url = `https://api.telegram.org/bot${env.BOT_TOKEN}/editMessageText`;
-  await fetch(url, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({
-      chat_id: chatId,
-      message_id: messageId,
-      text: text,
-    }),
-  });
 }
