@@ -45,7 +45,7 @@ export default {
     const url = 'https://www.iranjib.ir/showgroup/23/realtime_price/';
     
     // 1. Send an initial "loading" message
-    const initialMessage = await telegram.sendMessage(chatId, 'Fetching latest gold price... ⏳', env);
+    const initialMessage = await telegram.sendMessage(chatId, 'Fetching latest gold price...', env);
     const messageId = initialMessage.result.message_id;
 
     try {
@@ -60,9 +60,9 @@ export default {
       const data = parseGoldPrice(html);
 
       // 4. Format the final message
-      const resultText = `🥇 **18 Karat Gold Price**\n\n` +
-                         `- **Live Price:** \`${data.livePrice}\` Rial\n` +
-                         `- **Change:** \`${data.change}\``;
+      const resultText = `18 Karat Gold Price\n\n` +
+                         `- Live Price: \`${data.livePrice}\` Rial\n` +
+                         `- Prize Change: \`${data.change}\``;
 
       // 5. Edit the original message with the result
       await telegram.editMessage(chatId, messageId, resultText, env);
@@ -70,7 +70,7 @@ export default {
     } catch (error) {
       console.error(error);
       // If anything goes wrong, inform the user
-      await telegram.editMessage(chatId, messageId, `❌ **Error:**\nCould not retrieve the gold price. The website structure may have changed or it might be temporarily unavailable.`, env);
+      await telegram.editMessage(chatId, messageId, `Error:\nCould not retrieve the gold price. The website structure may have changed or it might be temporarily unavailable.`, env);
     }
   },
 };

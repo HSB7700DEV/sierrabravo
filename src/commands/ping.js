@@ -22,7 +22,7 @@ export default {
     if (response && response.ok) {
       const messageId = response.result.message_id;
       // Edit the message to show the latency
-      await telegram.editMessage(chatId, messageId, `Pong! 🏓\nLatency: ${latency} ms`, env);
+      await telegram.editMessage(chatId, messageId, `Bot latency: ${latency} ms`, env);
     }
   },
 };
