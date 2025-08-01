@@ -43,7 +43,7 @@ export default {
     const threadId = message.message_thread_id;
     
     // 1. Send an initial "loading" message
-    const initialMessage = await telegram.sendMessage(chatId, 'Fetching latest market data... ⏳', env, threadId);
+    const initialMessage = await telegram.sendMessage(chatId, 'Fetching latest market data... ', env, threadId);
     const messageId = initialMessage.result.message_id;
 
     try {
@@ -70,7 +70,7 @@ export default {
                          `- Price: \`${goldData.value}\` Rial\n` +
                          `- Change: \`${goldData.change}\`\n\n` +
                          `💲 *Tether (USDT)*\n` +
-                         `- Price: \`${tetherData.value}\` Rial\n` +
+                         `- Price: \`${tetherData.value}\` Toman\n` +
                          `- Change: \`${tetherData.change}\``;
 
       // 6. Edit the original message with the result
