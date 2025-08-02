@@ -22,6 +22,6 @@ export default {
 
     const welcomeMessage = `This is SierraBravo.\n\n/ping - Check if the bot is alive\n/currencyprize - Get the Real-time price of currencies`;
 
-    await telegram.sendMessage(chatId, welcomeMessage, env, threadId, replyMarkup);
+    await telegram.sendMessage(chatId, welcomeMessage, env, threadId);
   },
 };
