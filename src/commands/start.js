@@ -12,16 +12,15 @@ export default {
     const chatId = message.chat.id;
     const threadId = message.message_thread_id; // Get the thread ID
 
-    const welcomeMessage = `This is SierraBravo.\n\n/ping - Check if the bot is alive\n/currencyprize - Get the Real-time price of currencies`;
+    try {
+      const db = env.DB; // D1 binding from environment
+      await db.prepare('INSERT OR IGNORE INTO users (user_id) VALUES (?)').bind(chatId).run();
+    } catch (err) {
+      console.error('Failed to add user to DB:', err);
+      await telegram.sendMessage(chatId, 'Unexpected error on database!\nReport this to an adminisrator of the bot.', env, threadId);
+    }
 
-    const replyMarkup = {
-      inline_keyboard: [
-        [
-          { text: 'Ping', callback_data: 'ping' },
-          { text: 'Currency Price', callback_data: 'currencyprize' }
-        ]
-      ]
-    };
+    const welcomeMessage = `This is SierraBravo.\n\n/ping - Check if the bot is alive\n/currencyprize - Get the Real-time price of currencies`;
 
     await telegram.sendMessage(chatId, welcomeMessage, env, threadId, replyMarkup);
   },
