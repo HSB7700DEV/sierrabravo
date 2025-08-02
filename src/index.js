@@ -46,7 +46,7 @@ async function handleUpdate(update, env) {
         } catch (e) {
           console.error(e);
           // Reply in the correct thread if an error occurs
-          await telegram.sendMessage(message.chat.id, 'An error occurred while processing your command.', env, message.message_thread_id);
+          await telegram.sendMessage(message.chat.id, 'An error occurred while processing your command.\n\n' + e, env, message.message_thread_id);
         }
       }
     }
