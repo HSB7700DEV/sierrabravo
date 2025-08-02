@@ -13,6 +13,16 @@ export default {
     const threadId = message.message_thread_id; // Get the thread ID
 
     const welcomeMessage = `This is SierraBravo.\n\n/ping - Check if the bot is alive\n/currencyprize - Get the Real-time price of currencies`;
-    await telegram.sendMessage(chatId, welcomeMessage, env, threadId); // Pass it here
+
+    const replyMarkup = {
+      inline_keyboard: [
+        [
+          { text: 'Ping', callback_data: 'ping' },
+          { text: 'Currency Price', callback_data: 'currencyprize' }
+        ]
+      ]
+    };
+
+    await telegram.sendMessage(chatId, welcomeMessage, env, threadId, replyMarkup);
   },
 };
