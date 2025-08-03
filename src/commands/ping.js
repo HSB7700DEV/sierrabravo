@@ -1,5 +1,7 @@
 // src/commands/ping.js
 
+import { logErrorToAdmin } from '../utils/errorHandler.js';
+
 export default {
   name: '/ping',
   description: "Checks the bot's latency.",
