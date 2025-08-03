@@ -17,7 +17,7 @@ export default {
       await db.prepare('INSERT OR IGNORE INTO users (user_id) VALUES (?)').bind(chatId).run();
     } catch (err) {
       console.error('Failed to add user to DB:', err);
-      await telegram.sendMessage(chatId, 'Unexpected error on database!\nReport this to an adminisrator of the bot.', env, threadId);
+      await telegram.sendMessage(chatId, 'Unexpected error on database!\nReport this to an adminisrator of the bot.' + err, env, threadId);
     }
 
     const welcomeMessage = `This is SierraBravo.\n\n/ping - Check if the bot is alive\n/currencyprize - Get the Real-time price of currencies`;
