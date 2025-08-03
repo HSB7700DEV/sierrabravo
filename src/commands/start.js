@@ -1,7 +1,5 @@
 // src/commands/start.js
 
-import { logErrorToAdmin } from '../utils/errorHandler.js';
-
 export default {
   name: '/start',
   description: 'Welcomes the user to the bot.',
@@ -25,18 +23,7 @@ export default {
 
     const welcomeMessage = `This is SierraBravo.\n\n/ping - Check if the bot is alive\n/currencyprize - Get the Real-time price of currencies`;
     
-    try {
-      await telegram.sendMessage(chatId, welcomeMessage, env, threadId);
-      await logErrorToAdmin('/start', "THIS IS A TEST", env, telegram);
-    }
     
-    catch (err) {
-      // Use the imported function
-      await logErrorToAdmin('/start', err, env, telegram);
-
-      const userErrorMessage = 'An unexpected error occurred. The administrator has been notified.';
-      await telegram.sendMessage(message.chat.id, userErrorMessage, env, message.message_thread_id);
-    }
-    
+    await telegram.sendMessage(chatId, welcomeMessage, env, threadId);  
   },
 };
