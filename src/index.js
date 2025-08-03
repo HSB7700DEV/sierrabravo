@@ -1,9 +1,9 @@
-// src/index.js
-
 import telegram from './telegram';
 import startCommand from './commands/start';
 import pingCommand from './commands/ping';
 import currencyprizeCommand from './commands/currencyprize';
+import html from './index.html';
+
 
 // A Map to store our command handlers for easy lookup
 const commands = new Map();
@@ -13,14 +13,16 @@ commands.set(currencyprizeCommand.name, currencyprizeCommand.handler);
 
 export default {
   async fetch(request, env) {
-    // For debugging: log the incoming request
-    // console.log(JSON.stringify(await request.clone().json()));
-    
     if (request.method === "POST") {
       const payload = await request.json();
       return handleUpdate(payload, env);
     }
-    return new Response("This bot is running on Cloudflare Workers!");
+
+    return new Response(html, {
+      headers: {
+        'Content-Type': 'text/html;charset=UTF-8',
+      },
+    });
   },
 };
 
