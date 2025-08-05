@@ -54,6 +54,7 @@ export default {
                     headers: { 'Content-Type': 'application/json' },
                 });
             } catch (error) {
+                console.error('Error fetching currency data:', error);
                 return new Response(JSON.stringify({ error: error.message }), { status: 500, headers: { 'Content-Type': 'application/json' }});
             }
         }
@@ -82,10 +83,9 @@ export default {
  * @param {object} env The environment variables.
  */
 async function handleUpdate(update, env) {
-  // ... handleUpdate function remains the same ...
   if (update.message) {
     const message = update.message;
-    const text = message.text || ''; // Ensure text is not undefined
+    const text = message.text || ''; 
 
     // Check if the message text is a command
     if (text.startsWith('/')) {
@@ -97,8 +97,7 @@ async function handleUpdate(update, env) {
         try {
           await handler(message, env, telegram);
         } catch (e) {
-          console.error(e);
-          // Reply in the correct thread if an error occurs
+          console.error(`Error handling command ${commandName}:`, e);
           await telegram.sendMessage(message.chat.id, 'An error occurred while processing your command.\n\n' + e, env, message.message_thread_id);
         }
       }

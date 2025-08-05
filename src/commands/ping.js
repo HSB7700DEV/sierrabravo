@@ -27,5 +27,6 @@ export default {
       // Edit the message to show the latency
       await telegram.editMessage(chatId, messageId, `Bot latency: ${latency} ms`, env);
     }
+    console.log(`Ping command executed with latency: ${latency} ms`);
   },
 };

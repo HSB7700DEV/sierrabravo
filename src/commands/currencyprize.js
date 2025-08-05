@@ -70,7 +70,8 @@ export default {
                          `- Change: \`${goldData.change}\`\n\n` +
                          `💲 *Tether (USDT)*\n` +
                          `- Price: \`${tetherData.value}\` Toman\n` +
-                         `- Change: \`${tetherData.change}\``;
+                         `- Change: \`${tetherData.change}\`` +
+                         `Issued in ${new Date().toLocaleString()}`;
 
       // 6. Edit the original message with the result
       await telegram.editMessage(chatId, messageId, resultText, env);
@@ -78,7 +79,8 @@ export default {
     } catch (error) {
       console.error(error);
       // If anything goes wrong, inform the user
-      await telegram.editMessage(chatId, messageId, `❌ **Error:**\nCould not retrieve market data. The website may be unavailable or its layout has changed.`, env);
+      await telegram.editMessage(chatId, messageId, `**Error:**\nCould not retrieve market data. The website may be unavailable or its layout has changed.`, env);
     }
+    console.log(`currencyprize command executed`);
   },
 };

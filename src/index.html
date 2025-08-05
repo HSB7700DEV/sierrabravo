@@ -69,7 +69,7 @@
       background: none;
       border: none;
       color: var(--primary-text);
-      font-size: 1.8rem; /* Larger arrow */
+      font-size: 1.8rem;
       cursor: pointer;
       padding: 0;
       line-height: 1;
@@ -98,49 +98,35 @@
   
   <main>
     <div id="main-page" class="page-content">
-      <h1>SierraBravo Bot</h1>
-      <p>Under development... coming soon</p>
+      <p>Select an option...</p>
       <div class="button-container">
         <button id="show-currency-btn" class="btn">Currency Prize</button>
-        <button id="show-info-btn" class="btn">Your Info</button>
       </div>
+      <p>This bot is under development...</p>
     </div>
 
     <div id="currency-page" class="page-content hidden">
       <div id="currency-loader">Loading market data...</div>
       <div id="currency-data-card" class="data-card hidden">
         <div class="info-row">
-          <span class="info-label">🥇 18 Karat Gold Price</span>
+          <span class="info-label">18 Karat Gold Price</span>
           <span id="gold-price" class="info-value">--</span>
         </div>
         <div class="info-row">
-          <span class="info-label">📊 Gold Change</span>
+          <span class="info-label">Gold Change</span>
           <span id="gold-change" class="info-value">--</span>
         </div>
         <div class="info-row">
-          <span class="info-label">💲 Tether (USDT) Price</span>
+          <span class="info-label">Tether (USDT) Price</span>
           <span id="tether-price" class="info-value">--</span>
         </div>
         <div class="info-row">
-          <span class="info-label">📊 Tether Change</span>
+          <span class="info-label">Tether Change</span>
           <span id="tether-change" class="info-value">--</span>
         </div>
       </div>
     </div>
 
-    <div id="info-page" class="page-content hidden">
-       <div class="data-card">
-         <p style="font-size: 0.9rem;">This data is available when using the bot as a <a href="https://core.telegram.org/bots/webapps" target="_blank" rel="noopener">Telegram Web App</a>.</p>
-         <div class="info-row">
-           <span class="info-label">👤 Full Name</span>
-           <span class="info-value">Placeholder Name</span>
-         </div>
-         <div class="info-row">
-           <span class="info-label">🆔 Chat ID</span>
-           <span class="info-value">123456789</span>
-         </div>
-       </div>
-    </div>
   </main>
 
   <script>
@@ -197,6 +183,7 @@
         pingElement.textContent = `${Date.now() - startTime} ms`;
       } catch {
         pingElement.textContent = 'N/A';
+        console.error('Failed to ping the server');
       }
     }
 
@@ -221,7 +208,8 @@
             loader.classList.add('hidden');
             card.classList.remove('hidden');
         } catch (error) {
-            loader.textContent = `❌ Error: ${error.message}`;
+            loader.textContent = `Error: ${error.message}`;
+            console.error('Error fetching currency data:', error);
         }
     }
 
