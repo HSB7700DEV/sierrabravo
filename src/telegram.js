@@ -6,19 +6,24 @@
  * @param {string} text The text to send.
  * @param {object} env The environment variables.
  * @param {number | undefined} threadId The ID of the message thread (for topics).
+ * @param {object | undefined} replyMarkup The inline keyboard markup.
  * @returns {Promise<object>} The response from the Telegram API.
  */
-async function sendMessage(chatId, text, env, threadId) {
+async function sendMessage(chatId, text, env, threadId, replyMarkup) {
   const url = `https://api.telegram.org/bot${env.BOT_TOKEN}/sendMessage`;
   
   const payload = {
     chat_id: chatId,
     text: text,
-    parse_mode: 'Markdown' // Let's enable Markdown for better formatting
+    parse_mode: 'Markdown'
   };
 
   if (threadId) {
     payload.message_thread_id = threadId;
+  }
+  // Add the keyboard to the payload if it exists
+  if (replyMarkup) {
+    payload.reply_markup = replyMarkup;
   }
 
   const response = await fetch(url, {
