@@ -1,5 +1,4 @@
 // src/commands/currencyprize.js
-import { logErrorToAdmin } from '../utils/errorHandler.js';
 /**
  * A helper function to parse data from a specific row.
  * This function is now private to this command file.

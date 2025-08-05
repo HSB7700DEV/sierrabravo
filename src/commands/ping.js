@@ -1,6 +1,5 @@
 // src/commands/ping.js
 
-import { logErrorToAdmin } from '../utils/errorHandler.js';
 
 export default {
   name: '/ping',
