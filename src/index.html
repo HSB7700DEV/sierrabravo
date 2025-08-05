@@ -77,8 +77,8 @@
       const startTime = Date.now();
       
       try {
-        // A HEAD request is efficient as we only need the headers, not the full HTML body.
-        await fetch(window.location.href, { method: 'HEAD', cache: 'no-store' });
+        // We now call our dedicated API endpoint instead of the root URL.
+        await fetch('/api/ping', { cache: 'no-store' });
         const endTime = Date.now();
         const latency = endTime - startTime;
         pingElement.textContent = `${latency} ms`;

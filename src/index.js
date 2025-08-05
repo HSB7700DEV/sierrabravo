@@ -13,16 +13,32 @@ commands.set(currencyprizeCommand.name, currencyprizeCommand.handler);
 
 export default {
   async fetch(request, env) {
+    const url = new URL(request.url);
+
+    // 1. Handle API requests specifically for the web app
+    if (url.pathname === "/api/ping") {
+      // This endpoint is just for the web app to measure round-trip time.
+      // A 204 No Content response is efficient as we don't need a body.
+      return new Response(null, { status: 204 });
+    }
+
+    // 2. Handle incoming Telegram webhooks
     if (request.method === "POST") {
       const payload = await request.json();
       return handleUpdate(payload, env);
     }
 
-    return new Response(html, {
-      headers: {
-        'Content-Type': 'text/html;charset=UTF-8',
-      },
-    });
+    // 3. Serve the web app's HTML on the root URL
+    if (url.pathname === "/") {
+        return new Response(html, {
+            headers: {
+            'Content-Type': 'text/html;charset=UTF-8',
+            },
+        });
+    }
+
+    // 4. Return a 404 for any other path
+    return new Response("Not found.", { status: 404 });
   },
 };
 
