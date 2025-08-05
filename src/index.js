@@ -10,64 +10,6 @@ commands.set(startCommand.name, startCommand.handler);
 commands.set(pingCommand.name, pingCommand.handler);
 commands.set(currencyprizeCommand.name, currencyprizeCommand.handler);
 
-/**
- * Helper function to parse data from a specific row, adapted from currencyprize.js
- * @param {string} html The full HTML content of the page.
- * @param {string} rowIdentifier The unique text that identifies the target row.
- * @returns {{value: string, change: string} | null} The parsed data or null if not found.
- */
-
-/**
- * Creates a secret key for HMAC validation from the bot token.
- * @param {string} botToken The bot token.
- * @returns {Promise<CryptoKey>}
- */
-async function createSecretKey(botToken) {
-    const encoder = new TextEncoder();
-    const secret = encoder.encode("WebAppData");
-    const key = await crypto.subtle.importKey(
-        "raw",
-        encoder.encode(botToken),
-        { name: "HMAC", hash: "SHA-256" },
-        false,
-        ["sign"]
-    );
-    const hmac = await crypto.subtle.sign("HMAC", key, secret);
-    return crypto.subtle.importKey("raw", hmac, { name: "HMAC", hash: "SHA-256" }, false, ["sign", "verify"]);
-}
-
-/**
- * Validates the initData from Telegram.
- * @param {string} initData The initData string from the web app.
- * @param {string} botToken The bot token from environment variables.
- * @returns {Promise<object | null>} The parsed user data or null if invalid.
- */
-async function validateInitData(initData, botToken) {
-    const params = new URLSearchParams(initData);
-    const hash = params.get("hash");
-    params.delete("hash");
-    
-    const dataCheckString = Array.from(params.entries())
-        .sort(([a], [b]) => a.localeCompare(b))
-        .map(([key, value]) => `${key}=${value}`)
-        .join("\n");
-
-    const secretKey = await createSecretKey(botToken);
-    const encoder = new TextEncoder();
-    const data = encoder.encode(dataCheckString);
-    const signature = await crypto.subtle.sign("HMAC", secretKey, data);
-
-    const hexSignature = Array.from(new Uint8Array(signature))
-        .map((b) => b.toString(16).padStart(2, "0"))
-        .join("");
-    
-    if (hexSignature === hash) {
-        return Object.fromEntries(params.entries());
-    }
-    
-    return null;
-}
-
 
 function parseRow(html, rowIdentifier) {
     const rowStartIndex = html.indexOf(rowIdentifier);
@@ -113,31 +55,6 @@ export default {
                 });
             } catch (error) {
                 return new Response(JSON.stringify({ error: error.message }), { status: 500, headers: { 'Content-Type': 'application/json' }});
-            }
-        }
-        if (url.pathname === "/api/user" && request.method === "POST") {
-            try {
-                const { initData } = await request.json();
-                if (!initData) {
-                    return new Response(JSON.stringify({ error: "initData is required." }), { status: 400 });
-                }
-
-                const userData = await validateInitData(initData, env.BOT_TOKEN);
-
-                if (userData && userData.user) {
-                    const user = JSON.parse(userData.user);
-                    return new Response(JSON.stringify({
-                        id: user.id,
-                        firstName: user.first_name,
-                        lastName: user.last_name,
-                        username: user.username,
-                    }), { headers: { 'Content-Type': 'application/json' } });
-                } else {
-                    return new Response(JSON.stringify({ error: "Invalid initData." }), { status: 403 });
-                }
-            } catch (error) {
-                console.error("User validation error:", error);
-                return new Response(JSON.stringify({ error: "Server error during validation." }), { status: 500 });
             }
         }
     }

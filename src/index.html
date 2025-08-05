@@ -129,28 +129,21 @@
     </div>
 
     <div id="info-page" class="page-content hidden">
-       <div id="info-loader">Loading user data...</div>
-       <div id="info-data-card" class="data-card hidden">
+       <div class="data-card">
+         <p style="font-size: 0.9rem;">This data is available when using the bot as a <a href="https://core.telegram.org/bots/webapps" target="_blank" rel="noopener">Telegram Web App</a>.</p>
          <div class="info-row">
            <span class="info-label">👤 Full Name</span>
-           <span id="user-fullname" class="info-value">--</span>
+           <span class="info-value">Placeholder Name</span>
          </div>
          <div class="info-row">
            <span class="info-label">🆔 Chat ID</span>
-           <span id="user-id" class="info-value">--</span>
-         </div>
-         <div class="info-row">
-           <span class="info-label">Username</span>
-           <span id="user-username" class="info-value">--</span>
+           <span class="info-value">123456789</span>
          </div>
        </div>
     </div>
   </main>
 
   <script>
-
-    const tg = window.Telegram.WebApp;
-    tg.ready(); // Let Telegram know the app is ready
     // --- DOM Elements ---
     const header = document.getElementById('header');
     const pages = {
@@ -232,44 +225,9 @@
         }
     }
 
-    async function fetchUserData() {
-        showPage('info', 'Your Info');
-        const loader = document.getElementById('info-loader');
-        const card = document.getElementById('info-data-card');
-        loader.classList.remove('hidden');
-        card.classList.add('hidden');
-
-        // Check if initData is available
-        if (!tg.initData) {
-            loader.textContent = '❌ Error: This app must be opened from Telegram.';
-            return;
-        }
-
-        try {
-            const response = await fetch('/api/user', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ initData: tg.initData }),
-            });
-
-            const data = await response.json();
-            if (!response.ok) throw new Error(data.error || 'Failed to validate user');
-
-            document.getElementById('user-fullname').textContent = `${data.firstName} ${data.lastName || ''}`.trim();
-            document.getElementById('user-id').textContent = data.id;
-            document.getElementById('user-username').textContent = data.username ? `@${data.username}` : 'Not set';
-
-            loader.classList.add('hidden');
-            card.classList.remove('hidden');
-        } catch (error) {
-            loader.textContent = `❌ Error: ${error.message}`;
-        }
-    }
-
     // --- Event Listeners ---
     buttons.showCurrency.addEventListener('click', fetchCurrencyData);
-    // Update the info button to call the new function
-    buttons.showInfo.addEventListener('click', fetchUserData);
+    buttons.showInfo.addEventListener('click', () => showPage('info', 'Your Info')); // Pass the title
 
     // --- Initial Load ---
     window.addEventListener('load', () => {
