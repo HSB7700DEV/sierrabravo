@@ -4,40 +4,79 @@ import pingCommand from './commands/ping';
 import currencyprizeCommand from './commands/currencyprize';
 import html from './index.html';
 
-
 // A Map to store our command handlers for easy lookup
 const commands = new Map();
 commands.set(startCommand.name, startCommand.handler);
 commands.set(pingCommand.name, pingCommand.handler);
 commands.set(currencyprizeCommand.name, currencyprizeCommand.handler);
 
+/**
+ * Helper function to parse data from a specific row, adapted from currencyprize.js
+ * @param {string} html The full HTML content of the page.
+ * @param {string} rowIdentifier The unique text that identifies the target row.
+ * @returns {{value: string, change: string} | null} The parsed data or null if not found.
+ */
+function parseRow(html, rowIdentifier) {
+    const rowStartIndex = html.indexOf(rowIdentifier);
+    if (rowStartIndex === -1) return null;
+
+    const tableRowHtml = html.substring(rowStartIndex);
+    const cells = tableRowHtml.match(/<td[^>]*>([\s\S]*?)<\/td>/g);
+
+    if (!cells || cells.length < 2) return null;
+
+    const clean = (str) => str.replace(/<[^>]+>/g, '').trim();
+    const value = clean(cells[0]);
+    const change = clean(cells[1]);
+
+    return { value, change };
+}
+
+
 export default {
   async fetch(request, env) {
     const url = new URL(request.url);
 
-    // 1. Handle API requests specifically for the web app
-    if (url.pathname === "/api/ping") {
-      // This endpoint is just for the web app to measure round-trip time.
-      // A 204 No Content response is efficient as we don't need a body.
-      return new Response(null, { status: 204 });
+    // Handle API requests
+    if (url.pathname.startsWith('/api/')) {
+        if (url.pathname === "/api/ping") {
+            return new Response(null, { status: 204 });
+        }
+        if (url.pathname === "/api/currency") {
+            try {
+                const response = await fetch('https://www.iranjib.ir/showgroup/23/realtime_price/');
+                if (!response.ok) throw new Error(`Failed to fetch data. Status: ${response.status}`);
+                
+                const htmlText = await response.text();
+                const goldData = parseRow(htmlText, 'هر گرم طلای ۱۸ عیار');
+                const tetherData = parseRow(htmlText, 'تتر');
+
+                if (!goldData || !tetherData) throw new Error('Could not parse all required data.');
+
+                const data = { gold: goldData, tether: tetherData };
+                
+                return new Response(JSON.stringify(data), {
+                    headers: { 'Content-Type': 'application/json' },
+                });
+            } catch (error) {
+                return new Response(JSON.stringify({ error: error.message }), { status: 500, headers: { 'Content-Type': 'application/json' }});
+            }
+        }
     }
 
-    // 2. Handle incoming Telegram webhooks
+    // Handle Telegram webhooks
     if (request.method === "POST") {
       const payload = await request.json();
       return handleUpdate(payload, env);
     }
 
-    // 3. Serve the web app's HTML on the root URL
+    // Serve the web app's HTML on the root URL
     if (url.pathname === "/") {
         return new Response(html, {
-            headers: {
-            'Content-Type': 'text/html;charset=UTF-8',
-            },
+            headers: { 'Content-Type': 'text/html;charset=UTF-8' },
         });
     }
 
-    // 4. Return a 404 for any other path
     return new Response("Not found.", { status: 404 });
   },
 };
@@ -48,6 +87,7 @@ export default {
  * @param {object} env The environment variables.
  */
 async function handleUpdate(update, env) {
+  // ... handleUpdate function remains the same ...
   if (update.message) {
     const message = update.message;
     const text = message.text || ''; // Ensure text is not undefined
