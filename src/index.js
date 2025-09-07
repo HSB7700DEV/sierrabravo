@@ -31,12 +31,6 @@ function parseRow(html, rowIdentifier) {
 
 export default {
   async fetch(request, env) {
-    // Make sure you have the AI binding in your wrangler.toml or Cloudflare dashboard
-    // [[ai]]
-    // binding = "AI"
-    if (!env.AI) {
-      return new Response("AI binding not found. Please configure it in your settings.", { status: 500 });
-    }
       
     const url = new URL(request.url);
 
@@ -109,29 +103,6 @@ async function handleUpdate(update, env) {
           await telegram.sendMessage(message.chat.id, 'An error occurred while processing your command.\n\n' + e, env, message.message_thread_id);
         }
       }
-    } else if (text) { // **NEW**: Handle any other text message using AI
-        try {
-            // Let the user know the bot is "thinking"
-            await telegram.sendChatAction(message.chat.id, "typing", env, message.message_thread_id);
-
-            // Prepare the input for the AI model (chat style)
-            const chat = {
-              messages: [
-                { role: 'system', content: 'You are a helpful assistant.' },
-                { role: 'user', content: text }
-              ]
-            };
-            
-            // Run the AI model
-            const aiResponse = await env.AI.run('@cf/meta/llama-3-8b-instruct', chat);
-
-            // Send the AI's response back to the user
-            await telegram.sendMessage(message.chat.id, aiResponse.response, env, message.message_thread_id);
-
-        } catch (e) {
-            console.error('Error calling AI model:', e);
-            await telegram.sendMessage(message.chat.id, 'Sorry, I encountered an issue with the AI model.', env, message.message_thread_id);
-        }
     }
   }
   return new Response("OK");
