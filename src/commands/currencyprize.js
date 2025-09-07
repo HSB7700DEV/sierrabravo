@@ -17,11 +17,12 @@ function parseRow(html, rowIdentifier, valueIndex, changeIndex) {
   const tableRowHtml = html.substring(rowStartIndex);
   const cells = tableRowHtml.match(/<td[^>]*>([\s\S]*?)<\/td>/g);
 
-  if (!cells || cells.length < Math.max(valueIndex, changeIndex)) {
+  if (!cells || cells.length < Math.max(valueIndex, changeIndex) + 1) {
     return null;
   }
 
-  const clean = (str) => str.replace(/<[^>]+>/g, '').trim();
+  // Updated 'clean' function to remove HTML tags and invisible LRM/RLM characters
+  const clean = (str) => str.replace(/<[^>]+>/g, '').replace(/&lrm;|&#8206;|&rlm;|&#8207;/gi, '').trim();
   const value = clean(cells[valueIndex]);
   const change = clean(cells[changeIndex]);
 
@@ -71,7 +72,7 @@ export default {
                          `💲 *Tether (USDT)*\n` +
                          `- Price: \`${tetherData.value}\` Toman\n` +
                          `- Change: \`${tetherData.change}\`` +
-                         `Issued in ${new Date().toLocaleString()}`;
+                         `\n\nIssued in ${new Date().toLocaleString()}`;
 
       // 6. Edit the original message with the result
       await telegram.editMessage(chatId, messageId, resultText, env);
