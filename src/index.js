@@ -20,7 +20,8 @@ function parseRow(html, rowIdentifier) {
 
     if (!cells || cells.length < 2) return null;
 
-    const clean = (str) => str.replace(/<[^>]+>/g, '').trim();
+    // Updated 'clean' function to also remove LRM and RLM characters
+    const clean = (str) => str.replace(/<[^>]+>/g, '').replace(/&lrm;|&#8206;|&rlm;|&#8207;/gi, '').trim();
     const value = clean(cells[0]);
     const change = clean(cells[1]);
 
