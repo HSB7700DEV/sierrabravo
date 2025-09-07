@@ -22,7 +22,7 @@ export default {
       await logErrorToAdmin('/start', err, env, telegram);
     }
 
-    const welcomeMessage = `This is SierraBravo.\n\n/ping - Check if the bot is alive\n/currencyprize - Get the Real-time price of currencies\n\nChat ID: ${chatId}`;
+    const welcomeMessage = `This is SierraBravo.\n\n/ping - Check if the bot is alive\n/currencyprize - Get Real-time price of currencies`;
     
     await telegram.sendMessage(chatId, welcomeMessage, env, threadId);  
     console.log(`start command executed`);
