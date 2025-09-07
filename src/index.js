@@ -31,12 +31,6 @@ function parseRow(html, rowIdentifier) {
 
 export default {
   async fetch(request, env) {
-    // Make sure you have the AI binding in your wrangler.toml or Cloudflare dashboard
-    // [[ai]]
-    // binding = "AI"
-    if (!env.AI) {
-      return new Response("AI binding not found. Please configure it in your settings.", { status: 500 });
-    }
       
     const url = new URL(request.url);
 
