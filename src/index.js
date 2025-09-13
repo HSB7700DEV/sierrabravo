@@ -2,7 +2,7 @@ import telegram from './telegram';
 import startCommand from './commands/start';
 import pingCommand from './commands/ping';
 import currencyprizeCommand from './commands/currencyprize';
-import html from './index.html';
+import html from '/main/index.html';
 
 // A Map to store our command handlers for easy lookup
 const commands = new Map();
