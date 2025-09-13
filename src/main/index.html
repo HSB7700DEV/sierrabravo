@@ -135,11 +135,13 @@
     const pages = {
       main: document.getElementById('main-page'),
       currency: document.getElementById('currency-page'),
-      info: document.getElementById('info-page'),
+      // REMOVED: There is no element with id 'info-page' in the HTML.
+      // info: document.getElementById('info-page'), 
     };
     const buttons = {
       showCurrency: document.getElementById('show-currency-btn'),
-      showInfo: document.getElementById('show-info-btn'),
+      // REMOVED: There is no element with id 'show-info-btn' in the HTML.
+      // showInfo: document.getElementById('show-info-btn'), 
     };
     
     // --- Header Template for Main Page ---
@@ -153,7 +155,12 @@
     // --- Navigation and Header Management ---
     function showPage(pageId, title) {
       // Hide all pages
-      Object.values(pages).forEach(page => page.classList.add('hidden'));
+      Object.values(pages).forEach(page => {
+        // Added a check to ensure the page element exists before accessing its classList
+        if (page) {
+          page.classList.add('hidden');
+        }
+      });
       // Show the target page
       if (pages[pageId]) {
         pages[pageId].classList.remove('hidden');
@@ -179,6 +186,7 @@
       pingElement.textContent = 'Pinging...';
       const startTime = Date.now();
       try {
+        // Assuming a '/api/ping' endpoint exists
         await fetch('/api/ping', { cache: 'no-store' });
         pingElement.textContent = `${Date.now() - startTime} ms`;
       } catch {
@@ -195,6 +203,7 @@
         card.classList.add('hidden');
 
         try {
+            // Assuming a '/api/currency' endpoint exists
             const response = await fetch('/api/currency');
             const data = await response.json();
             if (!response.ok) throw new Error(data.error || 'Failed to fetch');
@@ -214,8 +223,12 @@
     }
 
     // --- Event Listeners ---
-    buttons.showCurrency.addEventListener('click', fetchCurrencyData);
-    buttons.showInfo.addEventListener('click', () => showPage('info', 'Your Info')); // Pass the title
+    if (buttons.showCurrency) {
+      buttons.showCurrency.addEventListener('click', fetchCurrencyData);
+    }
+    
+    // REMOVED: This would cause an error because buttons.showInfo does not exist.
+    // buttons.showInfo.addEventListener('click', () => showPage('info', 'Your Info'));
 
     // --- Initial Load ---
     window.addEventListener('load', () => {
