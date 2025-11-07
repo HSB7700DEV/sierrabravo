@@ -3,7 +3,6 @@ import startCommand from './commands/start';
 import pingCommand from './commands/ping';
 import currencyprizeCommand from './commands/currencyprize';
 import html from '/main/index.html';
-import getGoldAndDollarRates from './goldapi';
 
 // A Map to store our command handlers for easy lookup
 const commands = new Map();
@@ -62,14 +61,7 @@ export default {
             }
         }
     }
-
-    if (url.pathname === "/gold") {
-      const data = await getGoldAndDollarRates();
-      return new Response(JSON.stringify(data, null, 2), {
-        headers: { "Content-Type": "application/json" },
-      });
-    }
-
+    
     // Handle Telegram webhooks
     if (request.method === "POST") {
       const payload = await request.json();
