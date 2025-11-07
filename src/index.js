@@ -3,7 +3,7 @@ import startCommand from './commands/start';
 import pingCommand from './commands/ping';
 import currencyprizeCommand from './commands/currencyprize';
 import html from '/main/index.html';
-import getGoldAndDollarRates from './api/goldapi'
+import getGoldAndDollarRates from './api/goldapi';
 
 // A Map to store our command handlers for easy lookup
 const commands = new Map();
